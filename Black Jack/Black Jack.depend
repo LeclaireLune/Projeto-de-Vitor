@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1728264904 source:c:\users\jpb\desktop\codeblocks\projeto\black jack\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+
