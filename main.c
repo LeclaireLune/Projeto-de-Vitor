@@ -101,12 +101,16 @@ int jogo (){ //GameManager do jogo, onde ser�o chamadas as fun��es
         printf("Ocorreu um erro na memoria...");
         exit(1);
     }
+
+    // Exemplo de Teste (só pra ver se o baralho funciona)
+    // (comeca aqui)*************************************
     printf("\nBaralho completo: \n");
     for (int i = 0; i < varTamBaralho; i++)
     {
         printf("%c%c ", baralho[i].naipe, baralho[i].rank);
     }
 
+    // O player pega carta duas vezes
     pegarCarta(cartasPlayer, ptr_totCartasPlayer, baralho, ptrVarTamBaralho);
     pegarCarta(cartasPlayer, ptr_totCartasPlayer, baralho, ptrVarTamBaralho);
     
@@ -120,6 +124,7 @@ int jogo (){ //GameManager do jogo, onde ser�o chamadas as fun��es
         printf("\nNaipe: %c // Rank: %c", cartasPlayer[i].naipe, cartasPlayer[i].rank);
     }
 
+    // (termina aqui)*************************************
     turno ();
     printf ("\n\n");
 
