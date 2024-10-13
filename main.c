@@ -4,21 +4,24 @@
 #include <time.h>
 #define tamBaralho 52
 
+int varTamBaralho = 52; // VariÃ¡vel do tam do baralho q pode alterar no decorrer do codigo
+int *ptrVarTamBaralho = &varTamBaralho; // Ponteiro pra poder alterar o valor por funÃ§Ãµes
+
 char opcao1; //escolhas do jogador
 char opcao2;
-int i; // variavel i pro for, nao faço a mínima ideia do pq ele quer tanto q eu declare ela fora dos parametros do for, ent deixa ela aq msm
+int i; // variavel i pro for, nao faï¿½o a mï¿½nima ideia do pq ele quer tanto q eu declare ela fora dos parametros do for, ent deixa ela aq msm
 
 char *ranks [] = {'A','2','3','4','5','6','7','8','9','10','J','Q','K'};
 char *naipes [] = {'C','O','E','P'};
 
-typedef struct { //struct que terá as informções de cara carta naipe e rank
+typedef struct { //struct que terï¿½ as informï¿½ï¿½es de cara carta naipe e rank
     char *rank;
     char *naipe;
 }Carta;
 
-int indiceBlh = 0; //indice que irá idicar cada carta de 0-52
+int indiceBlh = 0; //indice que irï¿½ idicar cada carta de 0-52
 
-int geradorBaralho (Carta *baralho){ // Função q irá gerar todo o baralho
+void geradorBaralho (Carta *baralho){ // Funï¿½ï¿½o q irï¿½ gerar todo o baralho
     for (int i=0; i<4; i++){
         for (int j=0; j<13; j++){
             baralho[indiceBlh].rank = ranks [j];
@@ -29,17 +32,28 @@ int geradorBaralho (Carta *baralho){ // Função q irá gerar todo o baralho
 
 }
 
-int embaralharBaralho ( Carta *baralho ){ //adicionado embaralhador de cartas
-    for (i; i < tamBaralho; i++){ //desgraçado do i q quer pq quer ser declarado fora dos parâmetros do for
+void embaralharBaralho ( Carta *baralho ){ //adicionado embaralhador de cartas
+    for (i; i < tamBaralho; i++){ //desgraï¿½ado do i q quer pq quer ser declarado fora dos parï¿½metros do for
         int r = rand () % tamBaralho;
-        Carta temp = baralho [i]; // temp: struct temporario pro armazenamento das cartas q vão ser geradas numa ordem aleatória
+        Carta temp = baralho [i]; // temp: struct temporario pro armazenamento das cartas q vï¿½o ser geradas numa ordem aleatï¿½ria
         baralho [i] = baralho [r];
         baralho [r] = temp;
     }
 
 }
 
-int menu (){ //Função de menu
+void pegarCarta( Carta *deckAlvo, int *numCartasAgora, Carta *baralho , int *tamanhoBaralho ){
+    deckAlvo[(*numCartasAgora)] = baralho[0]; // O deck alvo recebe a primeira carta do baralho
+    (*numCartasAgora)++; // Troca do Ã­ndice do deck alvo
+    for (int i = 0; i < *tamanhoBaralho; i++){
+        baralho[i] = baralho[i + 1]; // Substitui o primeiro elemento pelo q vem depois, e assim vai
+    }
+    (*tamanhoBaralho)--;
+    baralho = (Carta*) realloc(baralho, ((*tamanhoBaralho) - 1) * sizeof(Carta));
+}
+
+
+int menu (){ //Funï¿½ï¿½o de menu
     printf ("Bem-vindo ao menu, deseja jogar? y/n ");
     scanf (" %c", &opcao1);
     if (opcao1 == 'y'){
@@ -58,22 +72,63 @@ int menu (){ //Função de menu
 
 }
 
-int turno (){ //função para andamento de turno
+int turno (){ //funï¿½ï¿½o para andamento de turno
     printf ("\n\n\t\tDeseja adicionar mais cartas? y/n ");
     scanf ("%c ", &opcao2);
 }
 
-int jogo (){ //GameManager do jogo, onde serão chamadas as funções
+int jogo (){ //GameManager do jogo, onde serï¿½o chamadas as funï¿½ï¿½es
     int valor = 0;
+
+    int initCartasDealer = 1, initCartasPlayer = 2; // NÃºmero inicial de cartas para cada um 
+    int totCartasDealer = 0, totCartasPlayer = 0; // Ambos comeÃ§am com 0 cartas
+    
+    int *ptr_totCartasDealer = &totCartasDealer; // Ponteiros sÃ³ p poder alterar o valor por meio de funÃ§Ãµes
+    int *ptr_totCartasPlayer = &totCartasPlayer; 
+    
+    int sizeofCarta = sizeof(Carta); // Tamanho da struct, sÃ³ pra nÃ£o repetir o sizeof nos malloc logo abaixo
+    
     printf ("\t\t\tJogo de Black Jack\t\t\t\n\n");
     Carta baralho [tamBaralho]; //array do struct carta
     geradorBaralho(baralho);
+    embaralharBaralho(baralho);
+
+    // O nÃºmero de cartas pode alterar, entao coloquei uma alocaÃ§Ã£o de memÃ³ria aqui pra Vitor ver q sabemos usar (ou nao)
+    Carta *cartasDealer = (Carta*) malloc(initCartasDealer * sizeofCarta);
+    Carta *cartasPlayer = (Carta*) malloc(initCartasPlayer * sizeofCarta);
+    
+    if (cartasDealer == NULL || cartasPlayer == NULL){
+        printf("Ocorreu um erro na memoria...");
+        exit(1);
+    }
+    printf("\nBaralho completo: \n");
+    for (int i = 0; i < varTamBaralho; i++)
+    {
+        printf("%c%c ", baralho[i].naipe, baralho[i].rank);
+    }
+
+    pegarCarta(cartasPlayer, ptr_totCartasPlayer, baralho, ptrVarTamBaralho);
+    pegarCarta(cartasPlayer, ptr_totCartasPlayer, baralho, ptrVarTamBaralho);
+    
+    printf("\nBaralho completo - 1: \n");
+    for (int i = 0; i < varTamBaralho; i++){
+        printf("%c%c ", baralho[i].naipe, baralho[i].rank);
+    }
+
+    printf("\nCartas Player:\n");
+    for(int i = 0; i < initCartasPlayer; i++){
+        printf("\nNaipe: %c // Rank: %c", cartasPlayer[i].naipe, cartasPlayer[i].rank);
+    }
+
     turno ();
     printf ("\n\n");
+
+    free(cartasDealer);
+    free(cartasPlayer);
 }
 
-int main() { //função main
-    srand (time(NULL));//função que criará uma semente aleatória para função rand (), que será ultilizada para gerar valores int aleatórios, no momento não está sendo ultilizada no código
+int main() { //funï¿½ï¿½o main
+    srand (time(NULL));//funï¿½ï¿½o que criarï¿½ uma semente aleatï¿½ria para funï¿½ï¿½o rand (), que serï¿½ ultilizada para gerar valores int aleatï¿½rios, no momento nï¿½o estï¿½ sendo ultilizada no cï¿½digo
     menu();
     return 0;
 }
