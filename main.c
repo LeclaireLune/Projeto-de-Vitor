@@ -5,19 +5,20 @@
 #define maxCartasPegas 10
 #define tamBaralho 52
 
-int varTamBaralho = 52; // Variável do tam do baralho q pode alterar no decorrer do codigo
+int varTamBaralho = 52; // Variï¿½vel do tam do baralho q pode alterar no decorrer do codigo
 char opcao1; // Escolhas do jogador
 char opcao2;
 
 const char *ranks[] = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
-const char *naipes[] = {"C", "O", "E", "P", "E"}; // Including "E" as "Espadas"
+const char *naipes[] = {"C", "O", "E", "P",}; // Including "E" as "Espadas"
+//retirei um "E" que tinha, o baralho sÃ³ tem 4 naipes
 
-typedef struct { // Struct que terá as informações de cada carta
+typedef struct { // Struct que terï¿½ as informaï¿½ï¿½es de cada carta
     const char *rank;
     const char *naipe;
 } Carta;
 
-void geradorBaralho(Carta *baralho) { // Função que irá gerar todo o baralho
+void geradorBaralho(Carta *baralho) { // Funï¿½ï¿½o que irï¿½ gerar todo o baralho
     int indiceBlh = 0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 13; j++) {
@@ -28,7 +29,7 @@ void geradorBaralho(Carta *baralho) { // Função que irá gerar todo o baralho
     }
 }
 
-void embaralharBaralho(Carta *baralho) { // Função para embaralhar cartas
+void embaralharBaralho(Carta *baralho) { // Funï¿½ï¿½o para embaralhar cartas
     for (int i = 0; i < tamBaralho; i++) {
         int r = rand() % tamBaralho;
         Carta temp = baralho[i]; // temp: struct temporario pro armazenamento das cartas q vao ser geradas numa ordem aleatoria
@@ -39,7 +40,7 @@ void embaralharBaralho(Carta *baralho) { // Função para embaralhar cartas
 
 void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta **baralho, int *tamanhoBaralho) {
     deckAlvo[(*numCartasAgora)] = (*baralho)[0]; // O deck alvo recebe a primeira carta do baralho
-    (*numCartasAgora)++; // Troca do índice do deck alvo
+    (*numCartasAgora)++; // Troca do ï¿½ndice do deck alvo
 
     for (int i = 0; i < *tamanhoBaralho - 1; i++) {
         (*baralho)[i] = (*baralho)[i + 1]; // Substitui o primeiro elemento pelo q vem depois, e assim vai
@@ -58,22 +59,23 @@ void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta **baralho, int *tama
 
 void jogoPlayer() {
 
-    int iniCartasPlayer = 2; // Número inicial de cartas para o jogador
+    int iniCartasPlayer = 2; // Nï¿½mero inicial de cartas para o jogador
     int totCartasPlayer = 0; //O jogador comeca com 0
+    int valorTotal=0;
 
     printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
 
-    // Alocação de memória para o baralho e cartas do jogador
+    // Alocaï¿½ï¿½o de memï¿½ria para o baralho e cartas do jogador
     Carta *baralho = malloc(tamBaralho * sizeof(Carta));
     if (baralho == NULL) {
-        printf("Erro ao alocar memória para o baralho.\n");
+        printf("Erro ao alocar memï¿½ria para o baralho.\n");
         exit(1);
     }
 
     geradorBaralho(baralho);
     embaralharBaralho(baralho);
 
-    // O número de cartas pode alterar, entao coloquei uma alocação de memória aqui pra Vitor ver q sabemos usar (ou nao)
+    // O nï¿½mero de cartas pode alterar, entao coloquei uma alocaï¿½ï¿½o de memï¿½ria aqui pra Vitor ver q sabemos usar (ou nao)
     Carta *cartasPlayer = malloc(maxCartasPegas * sizeof(Carta));
     if (cartasPlayer == NULL) {
         printf("Ocorreu um erro na memoria...");
@@ -88,7 +90,7 @@ void jogoPlayer() {
     for (int i = 0; i < iniCartasPlayer; i++) {
         printf("\n\t\t\tNaipe: %s // Rank: %s", cartasPlayer[i].naipe, cartasPlayer[i].rank);
     }
-    // Laço de repetição para adicionar cartas a mao do Jogador
+    // Laï¿½o de repetiï¿½ï¿½o para adicionar cartas a mao do Jogador
     do {
         printf("\n\n\t\tDeseja adicionar mais cartas? y/n ");
         scanf(" %c", &opcao2);
@@ -98,6 +100,16 @@ void jogoPlayer() {
             if (totCartasPlayer < maxCartasPegas) {
                 pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
                 printf("\t\t\tNaipe: %s // Rank: %s", cartasPlayer[totCartasPlayer - 1].naipe, cartasPlayer[totCartasPlayer - 1].rank);
+                valorTotal=somaCartas(cartasPlayer, &totCartasPlayer);
+                if(valorTotal==-1){
+                    printf("\n\t\t\tVocÃª perdeu!\n");
+                    break;
+                }else{
+                    if(valorTotal==21){
+                        printf("\n\t\t\tVocÃª Venceu!\n");
+                        break;
+                    }
+                }
             }
             else {
                 printf ("\t\t\tJogador atingiu o maximo de cartas pegas por turno.");
@@ -108,18 +120,65 @@ void jogoPlayer() {
             printf ("\n\t\t\tAgora e a vez do Dealer...\n\n");
             break;
         } else {
-            printf("Input Inválido.\n");
+            printf("Input Invï¿½lido.\n");
         }
     } while (1);
 
     printf("\n\n");
 
-    // Liberação de memória
+    // Liberaï¿½ï¿½o de memï¿½ria
     free(cartasPlayer);
     free(baralho);
 }
 
-int menu() { // Função de menu
+int somaCartas(Carta *deckAlvo, int *numCartasAgora){
+    int soma=0, x;
+    int *valorDeck = malloc((*numCartasAgora) * sizeof(int));
+
+    for(int i=0; i<*numCartasAgora; i++){
+        for(int j=1; j=10; j++){
+            if(deckAlvo[i].rank == 'J' || deckAlvo[i].rank == 'Q' || deckAlvo[i].rank == 'K'){
+                valorDeck[i]=10;
+            }else{
+                if(deckAlvo[i].rank == 'j'){
+                    if(deckAlvo[i].rank == '1'){
+                        do{
+                            printf("Desejas usar estÃ¡ carta como 1 ou 11? (1/11)\n");
+                            scanf(" %d", &x);
+                            if(x==1){
+                                valorDeck[i]=1;
+                            }else{
+                                if(x==11){
+                                    valorDeck[i]=11;
+                                }else{
+                                    printf("Valor invÃ¡lido!\nTente novamente.\n");
+                                }
+                            }
+                        }while(x!=1 || x!=11);
+                    }else{
+                        valorDeck[i]=j;
+                    }
+                }
+            }
+        }
+    }
+
+    for(int i=0; i<*numCartasAgora; i++){
+        soma=soma+valorDeck[i];
+        if(soma==21){
+            return soma;
+        }else{
+            if(soma>21){
+                return -1
+            }else{
+                return soma;
+            }
+        }
+    }
+    free(valorDeck);
+}
+
+int menu() { // Funï¿½ï¿½o de menu
     printf("Bem-vindo ao menu, deseja jogar? y/n ");
     scanf(" %c", &opcao1);
     if (opcao1 == 'y') {
@@ -130,14 +189,14 @@ int menu() { // Função de menu
         printf("Fechando...\n");
         return 1;
     } else {
-        printf("Comando inválido... \n");
+        printf("Comando invï¿½lido... \n");
         return menu();
     }
     return 0;
 }
 
-int main() { // Função main
-    srand(time(NULL)); // Cria uma semente aleatória
+int main() { // Funï¿½ï¿½o main
+    srand(time(NULL)); // Cria uma semente aleatï¿½ria
     menu();
     return 0;
 }
