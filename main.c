@@ -10,7 +10,7 @@ char opcao1; // Escolhas do jogador
 char opcao2;
 
 const char *ranks[] = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
-const char *naipes[] = {"C", "O", "E", "P", "E"}; // Including "E" as "Espadas"
+const char *naipes[] = {"C", "O", "P", "E"};
 
 typedef struct { // Struct que terá as informações de cada carta
     const char *rank;
