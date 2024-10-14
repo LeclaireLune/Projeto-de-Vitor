@@ -88,8 +88,8 @@ int somaCartas(Carta *deckAlvo, int *numCartasAgora){
                 }
             }
         }
-        for(int k=0; k<*numCartasAgora; j++){
-            soma=soma+vetorSoma[i];
+        for(int k=0; k<*numCartasAgora; k++){
+            soma=soma+vetorSoma[k];
         }
     }
     free(vetorSoma);
