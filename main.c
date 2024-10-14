@@ -11,7 +11,7 @@ char opcao2;
 int soma=0; //valor pra soma de cartas
 
 const char *ranks[] = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
-const char *naipes[] = {"Copas", "Ouro", "Espada", "Paus",};
+const char *naipes[] = {"Copas", "Ouro", "Espada", "Paus"};
 //retirei um "E" que tinha, o baralho só tem 4 naipes
 
 typedef struct { // Struct que ter� as informa��es de cada carta
@@ -55,7 +55,7 @@ void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta **baralho, int *tama
     // Reallocate baralho
     Carta *newBaralho = realloc(*baralho, (*tamanhoBaralho) * sizeof(Carta));
     if (newBaralho == NULL && *tamanhoBaralho > 0) {
-        fprintf(stderr, "Erro na realloc.\n");
+        fprintf(stderr, "Erro na realloc.\n");  
         exit(1);
     }
     *baralho = newBaralho; // Atualiza o ponteiro do baralho
@@ -77,9 +77,13 @@ int somaCartas(Carta *deckAlvo, int *numCartasAgora){
 
 
 void jogoPlayer() {
-    somaCartas(deckAlvo,numCartasAgora);
+    //somaCartas(deckAlvo,numCartasAgora);
     int iniCartasPlayer = 2; // N�mero inicial de cartas para o jogador
-    int totCartasPlayer = 0; //O jogador comeca com 0
+    int totCartasPlayer = 0; // O jogador comeca com 0
+
+    int iniCartasDealer = 1; // Número inicial de cartas para o computador/dealer
+    int totCartasDealer = 0; // O dealer comeca com 0
+
     int valorTotal=0;
 
     printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
@@ -96,7 +100,8 @@ void jogoPlayer() {
 
     // O n�mero de cartas pode alterar, entao coloquei uma aloca��o de mem�ria aqui pra Vitor ver q sabemos usar (ou nao)
     Carta *cartasPlayer = malloc(maxCartasPegas * sizeof(Carta));
-    if (cartasPlayer == NULL) {
+    Carta *cartasDealer = malloc(maxCartasPegas * sizeof(Carta));
+    if (cartasPlayer == NULL || cartasDealer == NULL) {
         printf("Ocorreu um erro na memoria...");
         exit(1);
     }
@@ -104,6 +109,9 @@ void jogoPlayer() {
     // O player pega carta duas vezes
     pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
     pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
+
+    // O dealer pega carta uma vez
+    pegarCarta(cartasDealer, &totCartasDealer, &baralho, &varTamBaralho);
 
     printf("\n\t\t\tCartas do Jogador:\n");
     for (int i = 0; i < iniCartasPlayer; i++) {
@@ -119,12 +127,15 @@ void jogoPlayer() {
             if (totCartasPlayer < maxCartasPegas) {
                 pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
                 printf("\t\t\tNaipe: %s // Rank: %s", cartasPlayer[totCartasPlayer - 1].naipe, cartasPlayer[totCartasPlayer - 1].rank);
-                somaCartas(cartasPlayer, &totCartasPlayer);
-                if(soma > 21){
+                if (somaCartas(cartasPlayer, &totCartasPlayer) == -1)
+                {
                     printf("\n\t\t\tVocê perdeu!\n");
                     break;
-                }else{
-                    if(soma == 21){
+                }
+                else
+                {
+                    if (somaCartas(cartasPlayer, &totCartasPlayer) == 21)
+                    {
                         printf("\n\t\t\tVocê Venceu!\n");
                         break;
                     }
@@ -147,6 +158,7 @@ void jogoPlayer() {
 
     // Libera��o de mem�ria
     free(cartasPlayer);
+    free(cartasDealer);
     free(baralho);
 }
 
