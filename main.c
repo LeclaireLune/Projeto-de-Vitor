@@ -61,7 +61,7 @@ void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta **baralho, int *tama
     *baralho = newBaralho; // Atualiza o ponteiro do baralho
 }
 int somaCartas(Carta *deckAlvo, int *numCartasAgora){
-    for(int i=0; i<*numCartasAgora; i++){
+    for(int i=0; i< (*numCartasAgora); i++){
             if (strcmp(deckAlvo[i].rank, "A") == 0) {
                 soma += 11;
             }
@@ -127,15 +127,12 @@ void jogoPlayer() {
             if (totCartasPlayer < maxCartasPegas) {
                 pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
                 printf("\t\t\tNaipe: %s // Rank: %s", cartasPlayer[totCartasPlayer - 1].naipe, cartasPlayer[totCartasPlayer - 1].rank);
-                if (somaCartas(cartasPlayer, &totCartasPlayer) == -1)
-                {
+                if (soma > 21){
                     printf("\n\t\t\tVocê perdeu!\n");
                     break;
                 }
-                else
-                {
-                    if (somaCartas(cartasPlayer, &totCartasPlayer) == 21)
-                    {
+                else{
+                    if (soma == 21){
                         printf("\n\t\t\tVocê Venceu!\n");
                         break;
                     }
