@@ -19,6 +19,37 @@ typedef struct { // Struct que ter� as informa��es de cada carta
     const char *naipe;
 } Carta;
 
+void desenharCartasLadoALado(Carta *cartas, int numCartas) {
+    for (int linha = 0; linha < 7; linha++) {  // Alterado para 7, pois o desenho tem 7 linhas (contando a borda inferior)
+        for (int i = 0; i < numCartas; i++) {
+            switch (linha) {
+                case 0:
+                    printf("\t┌───────┐ ");  // Linha superior
+                    break;
+                case 1:
+                    printf("\t│ %-2s    │ ", cartas[i].rank);  // Exibe o valor da carta (topo esquerdo)
+                    break;
+                case 2:
+                    printf("\t│       │ ");  // Linha vazia
+                    break;
+                case 3:
+                    printf("\t│ %-6s│ ", cartas[i].naipe);  // Exibe o naipe da carta
+                    break;
+                case 4:
+                    printf("\t│       │ ");  // Linha vazia
+                    break;
+                case 5:
+                    printf("\t│    %-2s │ ", cartas[i].rank);  // Exibe o valor da carta (base direita)
+                    break;
+                case 6:
+                    printf("\t└───────┘ ");  // Linha inferior
+                    break;
+            }
+        }
+        printf("\n");  // Pula para a próxima linha após imprimir todas as cartas na linha atual
+    }
+}
+
 Carta deckAlvo [tamBaralho];
 Carta numCartasAgora [tamBaralho];
 
@@ -80,49 +111,50 @@ int somaCartas(Carta *deckAlvo, int *numCartasAgora) {
 }
 
 
-int jogoPlayer(Carta *baralho) {
+int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
     int iniCartasPlayer = 2; // N�mero inicial de cartas para o jogador
-    int totCartasPlayer = 0; // O jogador comeca com 0
 
     int valorTotal=0;
 
     printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
 
     // O n�mero de cartas pode alterar, entao coloquei uma aloca��o de mem�ria aqui pra Vitor ver q sabemos usar (ou nao)
-    Carta *cartasPlayer = malloc(maxCartasPegas * sizeof(Carta));
-    if (cartasPlayer == NULL) {
-        printf("Ocorreu um erro na memoria...");
+    *cartasPlayer = malloc(maxCartasPegas * sizeof(Carta));
+    if (*cartasPlayer == NULL) {
+        printf("Ocorreu um erro na memória...");
         exit(1);
     }
 
     // O player pega carta duas vezes
-    pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
-    pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
+    pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
+    pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
 
     printf("\n\t\t\tCartas do Jogador:\n");
-    for (int i = 0; i < iniCartasPlayer; i++) {
-        printf("\n\t\t\tNaipe: %s // Rank: %s\n", cartasPlayer[i].naipe, cartasPlayer[i].rank);
-    }
+    desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
+
+
     // La�o de repeti��o para adicionar cartas a mao do Jogador
     do {
-        if(somaCartas(cartasPlayer,&totCartasPlayer) == 21){
+        if(somaCartas(*cartasPlayer,totCartasPlayer) == 21){
             printf("\n\t\t\tVocê Venceu!\n");
             return 1;
         }
         printf("\n\n\t\tDeseja adicionar mais cartas? y/n ");
         scanf(" %c", &opcao2);
-        printf("\x1b[1F\x1b[2K"); // Limpa a linha anterior
 
         if (opcao2 == 'y') {
-            if (totCartasPlayer < maxCartasPegas) {
-                pegarCarta(cartasPlayer, &totCartasPlayer, &baralho, &varTamBaralho);
-                printf("\t\t\tNaipe: %s // Rank: %s", cartasPlayer[totCartasPlayer - 1].naipe, cartasPlayer[totCartasPlayer - 1].rank);
-                if (somaCartas(cartasPlayer,&totCartasPlayer) > 21){
+            if (*totCartasPlayer < maxCartasPegas) {
+                pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
+                system("clear"); // Limpa a tela (use "cls" se estiver no Windows)
+                printf("\n\t\t\tCartas do Jogador:\n");
+                desenharCartasLadoALado(*cartasPlayer,*totCartasPlayer);
+                printf("\n");
+            if (somaCartas(*cartasPlayer,totCartasPlayer) > 21){
                     printf("\n\t\t\tVocê perdeu!\n");
                     return -1;
                 }
                 else{
-                    if (somaCartas(cartasPlayer,&totCartasPlayer) == 21){
+                    if (somaCartas(*cartasPlayer,totCartasPlayer) == 21){
                         printf("\n\t\t\tVocê Venceu!\n");
                         return 1;
                     }
@@ -131,11 +163,11 @@ int jogoPlayer(Carta *baralho) {
             else {
                 printf ("\t\t\tJogador atingiu o maximo de cartas pegas por turno.");
                 printf ("\n\t\t\tAgora e a vez do Dealer...\n\n");
-                return somaCartas(cartasPlayer,&totCartasPlayer);
+                return somaCartas(*cartasPlayer,totCartasPlayer);
             }
         } else if (opcao2 == 'n') {
             printf ("\n\t\t\tAgora e a vez do Dealer...\n\n");
-            return somaCartas(cartasPlayer,&totCartasPlayer);
+            return somaCartas(*cartasPlayer,totCartasPlayer);
         } else {
             printf("Input Inv�lido.\n");
         }
@@ -147,7 +179,7 @@ int jogoPlayer(Carta *baralho) {
     free(cartasPlayer);
 }
 
-void Dealer(Carta *baralho, int somaPlayer){
+void Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPlayer){
     int iniCartasDealer = 1; // Número inicial de cartas para o computador/dealer
     int totCartasDealer = 0; // O dealer comeca com 0
     int totalDealer = 0;
@@ -165,11 +197,21 @@ void Dealer(Carta *baralho, int somaPlayer){
     while(totalDealer<17 && totalDealer<somaPlayer){
         pegarCarta(cartasDealer, &totCartasDealer, &baralho, &varTamBaralho);
         totalDealer = somaCartas(cartasDealer, &totCartasDealer);
-        printf("\n\t\t\tNaipe: %s // Rank: %s\n",cartasDealer[totCartasDealer-1].naipe,cartasDealer[totCartasDealer-1].rank);
+        printf("\n");
+
+        // Limpa a linha do dealer e reimprime as cartas do jogador
+        printf("\x1b[2J"); // Limpa a tela
+        printf("\x1b[H"); // Move o cursor para o topo da tela
+
+        printf("\n\t\t\tCartas do Player:\n");
+        desenharCartasLadoALado(cartasPlayer, *totCartasPlayer);
+
+        printf("\n\t\t\tCartas do Dealer:\n");
+        desenharCartasLadoALado(cartasDealer,totCartasDealer);
     }
 
-    if(totalDealer>21){
-        printf("\n\t\t\tVocê venceu! O Dealer estourou com: %d pontos\n",totalDealer);
+    if(totalDealer>21 || totalDealer<somaPlayer){
+        printf("\n\t\t\tVocê venceu! O Dealer ficou com: %d pontos\n",totalDealer);
     }else{
         if(totalDealer>somaPlayer){
             printf("\n\t\t\tVocê perdeu! O Dealer conseguiu: %d pontos\n",totalDealer);
@@ -182,17 +224,17 @@ void Dealer(Carta *baralho, int somaPlayer){
         }
     }
 
-
     free(cartasDealer);
 }
 
 int menu() { // Fun��o de menu
     int somaPlayer;
+    char respPlayer;
 
     printf("\t\tBem-vindo ao menu, deseja jogar? y/n ");
     scanf(" %c", &opcao1);
     if (opcao1 == 'y') {
-        system("cls");
+        system("clear");
         Carta *baralho = malloc(tamBaralho * sizeof(Carta));
         if (baralho == NULL) {
             printf("Erro ao alocar mem�ria para o baralho.\n");
@@ -201,10 +243,18 @@ int menu() { // Fun��o de menu
         geradorBaralho(baralho);
         embaralharBaralho(baralho);
 
-        somaPlayer=jogoPlayer(baralho);
+        int totCartasPlayer = 0;
+        Carta *cartasPlayer = NULL;
+        somaPlayer = jogoPlayer(&cartasPlayer, &totCartasPlayer, baralho);
+
+
         if(somaPlayer!=1 && somaPlayer!=-1){
-            Dealer(baralho,somaPlayer);
-            return 1;
+            Dealer(baralho, somaPlayer, cartasPlayer, &totCartasPlayer);
+        }
+        printf("\n\t\t\tDeseja jogar novamente? y/n\n");
+        scanf(" %c",&respPlayer);
+        if(respPlayer=='y'){
+            return menu();
         }
         free(baralho);
     } else if (opcao1 == 'n') {
