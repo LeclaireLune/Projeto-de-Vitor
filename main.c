@@ -24,11 +24,9 @@ void desenharCartasLadoALado(Carta *cartas, int numCartas) {
         for (int i = 0; i < numCartas; i++) {
             switch (linha) {
                 case 0:
-                    // printf("\t┌──────┐ ");  // Linha superior
                     printf("\t\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF ");
                     break;
                 case 1:
-                    //printf("\t│ %-2s    │ ", cartas[i].rank);  // Exibe o valor da carta (topo esquerdo)
                     printf("\t\xB3 %-2s    \xB3 ", cartas[i].rank);
                     break;
                 case 2:
