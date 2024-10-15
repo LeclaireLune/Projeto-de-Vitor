@@ -147,16 +147,23 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
             if (*totCartasPlayer < maxCartasPegas) {
                 pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
                 system("clear"); // Limpa a tela (use "cls" se estiver no Windows)
+
+                printf("\t\t----------------------------------\n");
+                printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
+                printf("\t\t----------------------------------\n");
+
                 printf("\n\t\t\tCartas do Jogador:\n");
                 desenharCartasLadoALado(*cartasPlayer,*totCartasPlayer);
                 printf("\n");
             if (somaCartas(*cartasPlayer,totCartasPlayer) > 21){
-                    printf("\n\t\t\tVocê perdeu!\n");
+                    printf("\n\t\t\t  Você perdeu!\n");
+                    printf("\n\t\t     Você obteve %d pontos.\n",somaCartas(*cartasPlayer,totCartasPlayer));
                     return -1;
                 }
                 else{
                     if (somaCartas(*cartasPlayer,totCartasPlayer) == 21){
-                        printf("\n\t\t\tVocê Venceu!\n");
+                        printf("\n\t\t\t  Você Venceu!\n");
+                        printf("\n\t\t     Você obteve %d pontos.\n",somaCartas(*cartasPlayer,totCartasPlayer));
                         return 1;
                     }
                 }
@@ -208,10 +215,10 @@ void Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasP
         printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
         printf("\t\t----------------------------------\n");
 
-        printf("\n\t\t\t  Cartas do Player:\n");
+        printf("\n\t\t\tCartas do Player:\n");
         desenharCartasLadoALado(cartasPlayer, *totCartasPlayer);
 
-        printf("\n\t\t\t  Cartas do Dealer:\n");
+        printf("\n\t\t\tCartas do Dealer:\n");
         desenharCartasLadoALado(cartasDealer,totCartasDealer);
     }
 
@@ -219,7 +226,7 @@ void Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasP
         printf("\n\t\tVocê venceu! O Dealer ficou com: %d pontos\n",totalDealer);
     }else{
         if(totalDealer>somaPlayer){
-            printf("\n\t\tVocê perdeu! O Dealer conseguiu: %d pontos\n",totalDealer);
+            printf("\n\t    Você perdeu! O Dealer conseguiu: %d pontos\n",totalDealer);
         }else{
             if(totalDealer==somaPlayer){
                 printf("\n\t\tVocê empatou! Ambos ficaram com: %d pontos\n",totalDealer);
@@ -236,7 +243,7 @@ int menu() { // Fun��o de menu
     int somaPlayer;
     char respPlayer;
 
-    printf("\t\tBem-vindo ao menu, deseja jogar? y/n ");
+    printf("\t      Bem-vindo ao menu, deseja jogar? y/n ");
     scanf(" %c", &opcao1);
     if (opcao1 == 'y') {
         system("clear");
@@ -255,7 +262,7 @@ int menu() { // Fun��o de menu
         if(somaPlayer!=1 && somaPlayer!=-1){
             Dealer(baralho, somaPlayer, cartasPlayer, &totCartasPlayer);
         }
-        printf("\n\t\t\tDeseja jogar novamente? y/n ");
+        printf("\n\t\t   Deseja jogar novamente? y/n ");
         scanf(" %c",&respPlayer);
         printf("\n");
         if(respPlayer=='y'){
