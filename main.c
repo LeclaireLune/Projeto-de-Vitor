@@ -105,6 +105,10 @@ int jogoPlayer(Carta *baralho) {
     }
     // La�o de repeti��o para adicionar cartas a mao do Jogador
     do {
+        if(somaCartas(cartasPlayer,&totCartasPlayer) == 21){
+            printf("\n\t\t\tVocê Venceu!\n");
+            return 1;
+        }
         printf("\n\n\t\tDeseja adicionar mais cartas? y/n ");
         scanf(" %c", &opcao2);
         printf("\x1b[1F\x1b[2K"); // Limpa a linha anterior
