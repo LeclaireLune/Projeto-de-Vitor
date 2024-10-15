@@ -24,25 +24,27 @@ void desenharCartasLadoALado(Carta *cartas, int numCartas) {
         for (int i = 0; i < numCartas; i++) {
             switch (linha) {
                 case 0:
-                    printf("\t┌───────┐ ");  // Linha superior
+                    // printf("\t┌──────┐ ");  // Linha superior
+                    printf("\t\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF ");
                     break;
                 case 1:
-                    printf("\t│ %-2s    │ ", cartas[i].rank);  // Exibe o valor da carta (topo esquerdo)
+                    //printf("\t│ %-2s    │ ", cartas[i].rank);  // Exibe o valor da carta (topo esquerdo)
+                    printf("\t\xB3 %-2s    \xB3 ", cartas[i].rank);
                     break;
                 case 2:
-                    printf("\t│       │ ");  // Linha vazia
+                    printf("\t\xB3       \xB3 "); // Linha vazia
                     break;
                 case 3:
-                    printf("\t│ %-6s│ ", cartas[i].naipe);  // Exibe o naipe da carta
+                    printf("\t\xB3 %-6s\xB3 ", cartas[i].naipe); // Exibe o naipe da carta
                     break;
                 case 4:
-                    printf("\t│       │ ");  // Linha vazia
+                    printf("\t\xB3       \xB3 "); // Linha vazia
                     break;
                 case 5:
-                    printf("\t│    %-2s │ ", cartas[i].rank);  // Exibe o valor da carta (base direita)
+                    printf("\t\xB3    %-2s \xB3 ", cartas[i].rank); // Exibe o valor da carta (base direita)
                     break;
                 case 6:
-                    printf("\t└───────┘ ");  // Linha inferior
+                    printf("\t\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9 "); // Linha inferior
                     break;
             }
         }
@@ -146,7 +148,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
         if (opcao2 == 'y') {
             if (*totCartasPlayer < maxCartasPegas) {
                 pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
-                system("clear"); // Limpa a tela (use "cls" se estiver no Windows)
+                system("cls"); // Limpa a tela (use "cls" se estiver no Windows)
 
                 printf("\t\t----------------------------------\n");
                 printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
@@ -246,7 +248,7 @@ int menu() { // Fun��o de menu
     printf("\t      Bem-vindo ao menu, deseja jogar? y/n ");
     scanf(" %c", &opcao1);
     if (opcao1 == 'y') {
-        system("clear");
+        system("cls");
         Carta *baralho = malloc(tamBaralho * sizeof(Carta));
         if (baralho == NULL) {
             printf("Erro ao alocar mem�ria para o baralho.\n");
