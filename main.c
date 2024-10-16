@@ -140,6 +140,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
 
     printf("\n\t\t\tCartas do Jogador:\n");
     desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
+    printf("\n\t\t     Você tem %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
 
     // La�o de repeti��o para adicionar cartas a mao do Jogador
     do{
@@ -258,14 +259,27 @@ int Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPl
 int V_Player = 0, V_Dealer = 0, Empates = 0;
 
 void relatorio(int V_Player, int V_Dealer, int Empates){
+    FILE *arq_relat = fopen("relatorio.txt", "w");
+
+    fprintf(arq_relat, "\t\t----------------------------------\n");
+    fprintf(arq_relat, "\t\t\tRelatório do Black Jack\t\t\t\n\n");
+    fprintf(arq_relat, "\t\t----------------------------------\n");
+
+    fprintf(arq_relat, "\t\tO número de vitórias do player foram de: %d\n", V_Player);
+    fprintf(arq_relat, "\t   O número de derrotas para o Dealer foram de: %d\n", V_Dealer);
+    fprintf(arq_relat, "\t\tO número de empates foram de: %d\n", Empates);
+    fprintf(arq_relat, "\n\n");
+
     printf("\t\t----------------------------------\n");
     printf("\t\t\tRelatório do Black Jack\t\t\t\n\n");
     printf("\t\t----------------------------------\n");
-    
+
     printf("\t\tO número de vitórias do player foram de: %d\n",V_Player);
     printf("\t   O número de derrotas para o Dealer foram de: %d\n",V_Dealer);
     printf("\t\tO número de empates foram de: %d\n",Empates);
     printf("\n\n");
+
+    fclose(arq_relat);
 }
 
 int menu(){ // Fun��o de menu
@@ -305,26 +319,16 @@ int menu(){ // Fun��o de menu
             }
         }
         
-        printf("\t\tDeseja saber o relatório das partidas? y/n");
-        scanf(" %c",&respPlayer_2);
-        if(respPlayer_2 == 'y' && &resultDealer!=NULL){
-            relatorio(V_Player,V_Dealer,Empates);
-        }
-        
-        printf("\t\tDeseja zerar o relatório das partidas? y/n");
-        scanf(" %c",&respPlayer_3);
-        if(respPlayer_2 == 'y'){
-            V_Player=0;
-            V_Dealer=0;
-            Empates=0;
-            printf("relatório zerado!\n");
-        }
-        
         printf("\n\t\t   Deseja jogar novamente? y/n ");
         scanf(" %c", &respPlayer);
         printf("\n");
         if (respPlayer == 'y'){
             return menu();
+        }
+        else {
+            printf("Fechando...");
+            relatorio(V_Player, V_Dealer, Empates);
+            return 1;
         }
         free(baralho);
     }
