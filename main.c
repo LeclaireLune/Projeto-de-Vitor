@@ -93,7 +93,6 @@ void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta **baralho, int *tama
 }
 int somaCartas(Carta *deckAlvo, int *numCartasAgora) {
     int soma = 0;
-    int valor;
     for (int i = 0; i < (*numCartasAgora); i++) {
         if (strcmp(deckAlvo[i].rank, "A") == 0) {
             if(soma<=10){
@@ -112,9 +111,7 @@ int somaCartas(Carta *deckAlvo, int *numCartasAgora) {
 
 
 int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
-    int iniCartasPlayer = 2; // N�mero inicial de cartas para o jogador
-
-    int valorTotal=0;
+    
     printf("\t\t----------------------------------\n");
     printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
     printf("\t\t----------------------------------\n");
@@ -188,7 +185,6 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
 }
 
 void Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPlayer){
-    int iniCartasDealer = 1; // Número inicial de cartas para o computador/dealer
     int totCartasDealer = 0; // O dealer comeca com 0
     int totalDealer = 0;
     Carta *cartasDealer = malloc(maxCartasPegas * sizeof(Carta));
@@ -200,7 +196,6 @@ void Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasP
     // O dealer pega carta uma vez
     pegarCarta(cartasDealer, &totCartasDealer, &baralho, &varTamBaralho);
     totalDealer = somaCartas(cartasDealer, &totCartasDealer);
-    printf("\n\t\t\tNaipe: %s // Rank: %s\n",cartasDealer[totCartasDealer-1].naipe,cartasDealer[totCartasDealer-1].rank);
 
     while(totalDealer<17 && totalDealer<somaPlayer){
         pegarCarta(cartasDealer, &totCartasDealer, &baralho, &varTamBaralho);
