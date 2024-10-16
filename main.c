@@ -9,6 +9,7 @@ int varTamBaralho = 52; // Vari�vel do tam do baralho q pode alterar no decorr
 char opcao1;            // Escolhas do jogador
 char opcao2;
 int soma = 0; // valor pra soma de cartas
+char *clearTerminal = "cls";
 
 const char *ranks[] = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 const char *naipes[] = {
@@ -176,7 +177,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho)
             if (*totCartasPlayer < maxCartasPegas)
             {
                 pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
-                system("clear"); // Limpa a tela (use "cls" se estiver no Windows)
+                system(clearTerminal); // Limpa a tela (use "cls" se estiver no Windows)
 
                 printf("\t\t----------------------------------\n");
                 printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
@@ -297,7 +298,7 @@ int menu()
     scanf(" %c", &opcao1);
     if (opcao1 == 'y')
     {
-        system("clear");
+        system(clearTerminal);
         Carta *baralho = malloc(tamBaralho * sizeof(Carta));
         if (baralho == NULL)
         {
@@ -326,7 +327,7 @@ int menu()
     }
     else if (opcao1 == 'n')
     {
-        system("cls");
+        system(clearTerminal);
         printf("Fechando...\n");
         return 1;
     }
