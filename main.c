@@ -25,6 +25,12 @@ typedef struct{ // Struct que ter� as informa��es de cada carta
     const char *naipe;
 } Carta;
 
+void cabecalho(){
+    printf("\t\t----------------------------------\n");
+    printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
+    printf("\t\t----------------------------------\n");
+}
+
 void desenharCartasLadoALado(Carta *cartas, int numCartas){
     for (int linha = 0; linha < 7; linha++){ // Alterado para 7, pois o desenho tem 7 linhas (contando a borda inferior)
         for (int i = 0; i < numCartas; i++){
@@ -123,9 +129,7 @@ int somaCartas(Carta *deckAlvo, int *numCartasAgora){
 
 int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
 
-    printf("\t\t----------------------------------\n");
-    printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
-    printf("\t\t----------------------------------\n");
+    cabecalho();
 
     // O n�mero de cartas pode alterar, entao coloquei uma aloca��o de mem�ria aqui pra Vitor ver q sabemos usar (ou nao)
     *cartasPlayer = malloc(maxCartasPegas * sizeof(Carta));
@@ -157,9 +161,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
                 pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
                 system(clearTerminal); // Limpa a tela (use "cls" se estiver no Windows)
 
-                printf("\t\t----------------------------------\n");
-                printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
-                printf("\t\t----------------------------------\n");
+                cabecalho();
 
                 printf("\n\t\t\tCartas do Jogador:\n");
                 desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
@@ -167,6 +169,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
                 printf("\n\t\t     Você tem %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
                 if (somaCartas(*cartasPlayer, totCartasPlayer) > 21){
                     system(clearTerminal);
+                    cabecalho();
                     desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
                     printf("\n\t\t\t  Você perdeu!\n");
                     printf("\n\t\t     Você obteve %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
@@ -222,9 +225,7 @@ int Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPl
         printf("\x1b[2J"); // Limpa a tela
         printf("\x1b[H");  // Move o cursor para o topo da tela
 
-        printf("\t\t----------------------------------\n");
-        printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
-        printf("\t\t----------------------------------\n");
+        cabecalho();
 
         printf("\n\t\t\tCartas do Player:\n");
         desenharCartasLadoALado(cartasPlayer, *totCartasPlayer);
@@ -270,9 +271,7 @@ void relatorio(int V_Player, int V_Dealer, int Empates){
     fprintf(arq_relat, "\t\tO número de empates foram de: %d\n", Empates);
     fprintf(arq_relat, "\n\n");
 
-    printf("\t\t----------------------------------\n");
-    printf("\t\t\tRelatório do Black Jack\t\t\t\n\n");
-    printf("\t\t----------------------------------\n");
+    cabecalho();
 
     printf("\t\tO número de vitórias do player foram de: %d\n",V_Player);
     printf("\t   O número de derrotas para o Dealer foram de: %d\n",V_Dealer);
@@ -282,12 +281,16 @@ void relatorio(int V_Player, int V_Dealer, int Empates){
     fclose(arq_relat);
 }
 
+int x=1;
 int menu(){ // Fun��o de menu
     int somaPlayer, resultDealer=0;
     char respPlayer,respPlayer_2, respPlayer_3;
-    
+
+    if(x==1){
     printf("\t      Bem-vindo ao menu, deseja jogar? y/n ");
     scanf(" %c", &opcao1);
+    x+=1;
+    }
     if (opcao1 == 'y'){
         system(clearTerminal);
         Carta *baralho = malloc(tamBaralho * sizeof(Carta));
