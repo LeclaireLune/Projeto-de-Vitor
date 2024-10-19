@@ -2,14 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <ncurses.h>
 #define maxCartasPegas 10
 #define tamBaralho 52
 
+void iniciar_ncurses() {
+    initscr();      // Inicializando a tela com ncurses
+    cbreak();       // Desabilita o buffering da linha
+    noecho();       // Não mostra os caracteres digitados no terminal
+    keypad(stdscr, TRUE); // Habilita o uso de teclas especiais
+}
+
 int varTamBaralho = 52; // Vari�vel do tam do baralho q pode alterar no decorrer do codigo
-char opcao1;            // Escolhas do jogador
-char opcao2;
+// Escolhas do jogador
+int opcao2=-1;
 int soma = 0; // valor pra soma de cartas
-char *clearTerminal = "cls";
 
 const char *ranks[] = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 const char *naipes[] = {
@@ -26,9 +33,55 @@ typedef struct{ // Struct que ter� as informa��es de cada carta
 } Carta;
 
 void cabecalho(){
-    printf("\t\t----------------------------------\n");
-    printf("\t\t\tJogo de Black Jack\t\t\t\n\n");
-    printf("\t\t----------------------------------\n");
+    printw("\t\t\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\n");
+    printw("\t\t\tJogo de Black Jack\t\t\t\n\n");
+    printw("\t\t\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\n"); refresh();
+}
+
+void draw_button(WINDOW *win, int coord_y, int coord_x, const char *palavra){
+    mvwprintw(win, coord_y, coord_x, "\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF");      // Parte superior do botão
+    mvwprintw(win, coord_y+1, coord_x, "\xB3 %-8s \xB3", palavra); // Texto do botão
+    mvwprintw(win, coord_y+2, coord_x, "\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9");      // Parte inferior do botão
+    wrefresh(win);
+}
+
+int clique_button(int mouse_x, int mouse_y, int button_y, int button_x, int button_width, int button_height) {
+    return (mouse_x >= button_x && mouse_x <= button_x + button_width &&
+            mouse_y >= button_y && mouse_y <= button_y + button_height);
+}
+
+int botao_sn(MEVENT *mousevent, int coord_x, int coord_y,const char *button_1, const char *button_2) {
+    int resp_button = -1, value_button = 0;
+
+    draw_button(stdscr, coord_y, coord_x, button_1);  // Corrigido para usar button_1
+    draw_button(stdscr, coord_y, coord_x+15, button_2); // Corrigido para usar button_2
+    refresh();
+
+    while (1){
+        value_button = getch();
+
+        if (value_button == KEY_MOUSE){
+            if (getmouse(mousevent) == OK){
+                if (mousevent->bstate & BUTTON1_CLICKED){
+                    printw("Mouse clicked at (%d, %d)\n", mousevent->x, mousevent->y); refresh();
+                    if (clique_button(mousevent->x, mousevent->y, coord_y, coord_x, 13, 3)){
+                        resp_button = 1;
+                        printw("Botão 'Sim' clicado.\n");
+                        refresh();
+                        break;
+                    }else{
+                        if (clique_button(mousevent->x, mousevent->y, coord_y, coord_x+15, 13, 3)) {
+                            resp_button = 0;
+                            printw("Botão 'Não' clicado.\n");
+                            refresh();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return resp_button;
 }
 
 void desenharCartasLadoALado(Carta *cartas, int numCartas){
@@ -36,30 +89,31 @@ void desenharCartasLadoALado(Carta *cartas, int numCartas){
         for (int i = 0; i < numCartas; i++){
             switch (linha){
             case 0:
-                printf("\t\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF ");
+                printw("\t\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF ");
                 break;
             case 1:
-                printf("\t\xB3 %-2s    \xB3 ", cartas[i].rank);
+                printw("\t\xB3 %-2s    \xB3 ", cartas[i].rank);
                 break;
             case 2:
-                printf("\t\xB3       \xB3 "); // Linha vazia
+                printw("\t\xB3       \xB3 "); // Linha vazia
                 break;
             case 3:
-                printf("\t\xB3 %-6s\xB3 ", cartas[i].naipe); // Exibe o naipe da carta
+                printw("\t\xB3 %-6s\xB3 ", cartas[i].naipe); // Exibe o naipe da carta
                 break;
             case 4:
-                printf("\t\xB3       \xB3 "); // Linha vazia
+                printw("\t\xB3       \xB3 "); // Linha vazia
                 break;
             case 5:
-                printf("\t\xB3    %-2s \xB3 ", cartas[i].rank); // Exibe o valor da carta (base direita)
+                printw("\t\xB3    %-2s \xB3 ", cartas[i].rank); // Exibe o valor da carta (base direita)
                 break;
             case 6:
-                printf("\t\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9 "); // Linha inferior
+                printw("\t\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9 "); // Linha inferior
                 break;
             }
         }
-        printf("\n"); // Pula para a próxima linha após imprimir todas as cartas na linha atual
+        printw("\n"); // Pula para a próxima linha após imprimir todas as cartas na linha atual
     }
+    refresh();
 }
 
 Carta deckAlvo[tamBaralho];
@@ -110,7 +164,7 @@ int somaCartas(Carta *deckAlvo, int *numCartasAgora){
             soma += 11;
             num_A++;
         }
-        else{ 
+        else{
             if (strcmp(deckAlvo[i].rank, "J") == 0 || strcmp(deckAlvo[i].rank, "Q") == 0 || strcmp(deckAlvo[i].rank, "K") == 0){
                 soma += 10;
             }else{
@@ -127,14 +181,14 @@ int somaCartas(Carta *deckAlvo, int *numCartasAgora){
     return soma;
 }
 
-int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
+int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho, MEVENT *mousevent){
 
     cabecalho();
 
     // O n�mero de cartas pode alterar, entao coloquei uma aloca��o de mem�ria aqui pra Vitor ver q sabemos usar (ou nao)
     *cartasPlayer = malloc(maxCartasPegas * sizeof(Carta));
     if (*cartasPlayer == NULL){
-        printf("Ocorreu um erro na memória...");
+        printw("Ocorreu um erro na memória..."); refresh();
         exit(1);
     }
 
@@ -142,54 +196,54 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
     pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
     pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
 
-    printf("\n\t\t\tCartas do Jogador:\n");
+    printw("\n\t\t\tCartas do Jogador:\n");
     desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
-    printf("\n\t\t     Você tem %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
+    printw("\n\t\t     Você tem %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer)); refresh();
 
     // La�o de repeti��o para adicionar cartas a mao do Jogador
     do{
         if (somaCartas(*cartasPlayer, totCartasPlayer) == 21){
-            printf("\n\t\t     Você obteve %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
-            printf("\n\t\t\tAgora e a vez do Dealer...\n\n");
+            printw("\n\t\t     Você obteve %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
+            printw("\n\t\t\tAgora e a vez do Dealer...\n\n"); refresh();
             return somaCartas(*cartasPlayer, totCartasPlayer);
         }
-        printf("\n\n\t\tDeseja adicionar mais cartas? y/n ");
-        scanf(" %c", &opcao2);
+        //adicionar os botões hit me e stand
+        opcao2=botao_sn(mousevent, 16, 16,"hit me", "stand");//ordem: x -> y
 
-        if (opcao2 == 'y'){
+        if (opcao2 == 1){
             if (*totCartasPlayer < maxCartasPegas){
                 pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
-                system(clearTerminal); // Limpa a tela (use "cls" se estiver no Windows)
+                clear();
 
                 cabecalho();
 
-                printf("\n\t\t\tCartas do Jogador:\n");
+                printw("\n\t\t\tCartas do Jogador:\n");
                 desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
-                printf("\n");
-                printf("\n\t\t     Você tem %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
+                printw("\n");
+                printw("\n\t\t     Você tem %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer)); refresh();
                 if (somaCartas(*cartasPlayer, totCartasPlayer) > 21){
-                    system(clearTerminal);
+                    clear();
                     cabecalho();
                     desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
-                    printf("\n\t\t\t  Você perdeu!\n");
-                    printf("\n\t\t     Você obteve %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer));
+                    printw("\n\t\t\t  Você perdeu!\n");
+                    printw("\n\t\t     Você obteve %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer)); refresh();
                     return -1;
                 }
                 else{
                     if (somaCartas(*cartasPlayer, totCartasPlayer) == 21){
-                        printf("\n\t\t\tAgora e a vez do Dealer...\n\n");
+                        printw("\n\t\t\tAgora e a vez do Dealer...\n\n"); refresh();
                         return somaCartas(*cartasPlayer, totCartasPlayer);
                     }
                 }
             }
             else{
-                printf("\t\t\tJogador atingiu o maximo de cartas pegas por turno.");
-                printf("\n\t\t\tAgora e a vez do Dealer...\n\n");
+                printw("\t\t\tJogador atingiu o maximo de cartas pegas por turno.");
+                printw("\n\t\t\tAgora e a vez do Dealer...\n\n"); refresh();
                 return somaCartas(*cartasPlayer, totCartasPlayer);
             }
         }
-        else if (opcao2 == 'n'){
-            printf("\n\t\t\tAgora e a vez do Dealer...\n\n");
+        else if (opcao2 == 0){
+            printw("\n\t\t\tAgora e a vez do Dealer...\n\n"); refresh();
             return somaCartas(*cartasPlayer, totCartasPlayer);
         }
         else{
@@ -197,7 +251,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho){
         }
     } while (1);
 
-    printf("\n\n");
+    printw("\n\n"); refresh();
 
     // Libera��o de mem�ria
     free(cartasPlayer);
@@ -208,7 +262,7 @@ int Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPl
     int totalDealer = 0;
     Carta *cartasDealer = malloc(maxCartasPegas * sizeof(Carta));
     if (cartasDealer == NULL){
-        printf("Ocorreu um erro na memoria...");
+        printw("Ocorreu um erro na memoria..."); refresh();
         exit(1);
     }
 
@@ -219,36 +273,35 @@ int Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPl
     while (totalDealer < 17 && totalDealer < somaPlayer){
         pegarCarta(cartasDealer, &totCartasDealer, &baralho, &varTamBaralho);
         totalDealer = somaCartas(cartasDealer, &totCartasDealer);
-        printf("\n");
+        printw("\n");
 
-        // Limpa a linha do dealer e reimprime as cartas do jogador
-        printf("\x1b[2J"); // Limpa a tela
-        printf("\x1b[H");  // Move o cursor para o topo da tela
+        clear(); refresh();
 
         cabecalho();
 
-        printf("\n\t\t\tCartas do Player:\n");
-        desenharCartasLadoALado(cartasPlayer, *totCartasPlayer);
-        printf("\n\t\t     Você obteve %d pontos.\n", somaCartas(cartasPlayer, totCartasPlayer));
+        printw("\n\t\t\tCartas do Player:\n");
 
-        printf("\n\t\t\tCartas do Dealer:\n");
+        desenharCartasLadoALado(cartasPlayer, *totCartasPlayer);
+        printw("\n\t\t     Você obteve %d pontos.\n", somaCartas(cartasPlayer, totCartasPlayer)); refresh();
+
+        printw("\n\t\t\tCartas do Dealer:\n"); refresh();
         desenharCartasLadoALado(cartasDealer, totCartasDealer);
     }
 
     if (totalDealer > 21 || totalDealer < somaPlayer){
-        printf("\n\t\tVocê venceu! O Dealer ficou com: %d pontos\n", totalDealer);
+        printw("\n\t\tVocê venceu! O Dealer ficou com: %d pontos\n", totalDealer);refresh();
         return 1;
     }
     else{
         if (totalDealer > somaPlayer){
-            printf("\n\t    Você perdeu! O Dealer conseguiu: %d pontos\n", totalDealer);
+            printw("\n\t    Você perdeu! O Dealer conseguiu: %d pontos\n", totalDealer); refresh();
             return -1;
         }else{
             if (totalDealer == somaPlayer){
-                printf("\n\t\tVocê empatou! Ambos ficaram com: %d pontos\n", totalDealer);
+                printw("\n\t\tVocê empatou! Ambos ficaram com: %d pontos\n", totalDealer); refresh();
                 return 0;
             }else{
-                printf("\n\t\tVocê perdeu! O Dealer ficou com: %d pontos\n", totalDealer);
+                printw("\n\t\tVocê perdeu! O Dealer ficou com: %d pontos\n", totalDealer); refresh();
                 return -1;
             }
         }
@@ -273,29 +326,33 @@ void relatorio(int V_Player, int V_Dealer, int Empates){
 
     cabecalho();
 
-    printf("\t\tO número de vitórias do player foram de: %d\n",V_Player);
-    printf("\t   O número de derrotas para o Dealer foram de: %d\n",V_Dealer);
-    printf("\t\tO número de empates foram de: %d\n",Empates);
-    printf("\n\n");
+    printw("\t\tO número de vitórias do player foram de: %d\n",V_Player); refresh();
+    printw("\t   O número de derrotas para o Dealer foram de: %d\n",V_Dealer); refresh();
+    printw("\t\tO número de empates foram de: %d\n",Empates); refresh();
+    printw("\n\n"); refresh();
 
     fclose(arq_relat);
 }
 
-int x=1;
-int menu(){ // Fun��o de menu
-    int somaPlayer, resultDealer=0;
-    char respPlayer,respPlayer_2, respPlayer_3;
+int a=1, opcao1=-1;
+int menu(MEVENT *mousevent, int *opcao1) {
+    int somaPlayer, resultDealer = 0, *respPlayer;
 
-    if(x==1){
-    printf("\t      Bem-vindo ao menu, deseja jogar? y/n ");
-    scanf(" %c", &opcao1);
-    x+=1;
+    if (a == 1) {
+        printw("\t      Bem-vindo ao menu, deseja jogar?\n");
+        *opcao1 = botao_sn(mousevent, 15, 5,"sim", "não"); //ordem: x, y
+        printw("valor do opcao1: %d",*opcao1);
+        refresh();
+        a += 1;
     }
-    if (opcao1 == 'y'){
-        system(clearTerminal);
+
+    // Verifique se opcao1 foi setada
+
+    if (*opcao1 == 1) {
+        clear(); refresh();
         Carta *baralho = malloc(tamBaralho * sizeof(Carta));
-        if (baralho == NULL){
-            printf("Erro ao alocar mem�ria para o baralho.\n");
+        if (baralho == NULL) {
+            printw("Erro ao alocar memória para o baralho.\n"); refresh();
             exit(1);
         }
         geradorBaralho(baralho);
@@ -303,53 +360,65 @@ int menu(){ // Fun��o de menu
 
         int totCartasPlayer = 0;
         Carta *cartasPlayer = NULL;
-        somaPlayer = jogoPlayer(&cartasPlayer, &totCartasPlayer, baralho);
+        somaPlayer = jogoPlayer(&cartasPlayer, &totCartasPlayer, baralho, mousevent);
 
-        if(somaPlayer == -1){
+        // Verifique o resultado do jogo
+        if (somaPlayer == -1) {
             V_Dealer++;
-        }else{
-                if (somaPlayer != -1){
-                resultDealer=Dealer(baralho, somaPlayer, cartasPlayer, &totCartasPlayer);
-                if(resultDealer == 1){
-                    V_Player++;
-                }else{
-                    if(resultDealer == -1){
-                        V_Dealer++;
-                    }else{
-                        Empates++;
-                    }
-                }
+        } else if (somaPlayer >= 0) {
+            resultDealer = Dealer(baralho, somaPlayer, cartasPlayer, &totCartasPlayer);
+            if (resultDealer == 1) {
+                V_Player++;
+            } else if (resultDealer == -1) {
+                V_Dealer++;
+            } else {
+                Empates++;
             }
         }
-        
-        printf("\n\t\t   Deseja jogar novamente? y/n ");
-        scanf(" %c", &respPlayer);
-        printf("\n");
-        if (respPlayer == 'y'){
-            return menu();
+
+        printw("\n\t\t   Deseja jogar novamente?\n "); refresh();
+        if(somaPlayer >= 0){
+        *respPlayer=botao_sn(mousevent, 16, 25,"sim","não"); //ordem x, y
+        printw("\n"); refresh();
+        }else{
+        *respPlayer=botao_sn(mousevent, 16, 17,"sim","não"); //ordem x, y
+        printw("\n"); refresh();
+        }
+
+        if (*respPlayer == 1){
+            return menu(mousevent, opcao1);
         }
         else {
-            printf("Fechando...");
-            relatorio(V_Player, V_Dealer, Empates);
-            return 1;
+            if(*respPlayer == 0){
+                clear();
+                printw("Fechando..."); refresh();
+                relatorio(V_Player, V_Dealer, Empates);
+                return 1;
+            }
         }
         free(baralho);
     }
     else{
-        if (opcao1 == 'n'){
-            system(clearTerminal);
-            printf("Fechando...\n");
+        if (*opcao1 == 0){
+            printw("Fechando...\n"); refresh();
             return 1;
         }else{
-            printf("Comando inv�lido... \n");
-            return menu();
+            printw("Comando inválido... \n"); refresh();
+            return menu(mousevent, opcao1);
         }
     }
     return 0;
 }
 
 int main(){                      // Fun��o main
-    srand(time(NULL)); // Cria uma semente aleat�ria
-    menu();
+    srand(time(NULL)); // Cria uma semente aleatória
+
+    iniciar_ncurses();
+
+    mousemask(ALL_MOUSE_EVENTS, NULL);// habilita os eventos com o mouse
+    MEVENT mousevent;
+
+    menu(&mousevent, &opcao1);
+    endwin(); //finaliza a biblioteca
     return 0;
 }
