@@ -79,23 +79,19 @@ void embaralharBaralho(Carta *baralho){ // Fun��o para embaralhar cartas
     }
 }
 
-void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta **baralho, int *tamanhoBaralho){
-    deckAlvo[(*numCartasAgora)] = (*baralho)[0]; // O deck alvo recebe a primeira carta do baralho
+void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta *baralho, int *tamanhoBaralho){
+    deckAlvo[(*numCartasAgora)] = baralho[0]; // O deck alvo recebe a primeira carta do baralho
     (*numCartasAgora)++;                         // Troca do �ndice do deck alvo
 
     for (int i = 0; i < *tamanhoBaralho - 1; i++){
-        (*baralho)[i] = (*baralho)[i + 1]; // Substitui o primeiro elemento pelo q vem depois, e assim vai
+        baralho[i] = baralho[i + 1]; // Substitui o primeiro elemento pelo q vem depois, e assim vai
     }
     (*tamanhoBaralho)--;
 
     // Reallocate baralho
-    Carta *newBaralho = realloc(*baralho, (*tamanhoBaralho) * sizeof(Carta));
-    if (newBaralho == NULL && *tamanhoBaralho > 0){
-        fprintf(stderr, "Erro na realloc.\n");
-        exit(1);
-    }
-    *baralho = newBaralho; // Atualiza o ponteiro do baralho
+    baralho = (Carta*) realloc(baralho, (*tamanhoBaralho) * sizeof(Carta));
 }
+
 int somaCartas(Carta *deckAlvo, int *numCartasAgora){
     int soma = 0, num_A = 0;
     for (int i = 0; i < (*numCartasAgora); i++){
