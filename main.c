@@ -33,15 +33,15 @@ typedef struct{ // Struct que ter� as informa��es de cada carta
 } Carta;
 
 void cabecalho(){
-    printw("\t\t\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\n");
+    printw("\t\t\x─────────────────────\n");
     printw("\t\t\tJogo de Black Jack\t\t\t\n\n");
-    printw("\t\t\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\n"); refresh();
+    printw("\t\t\x─────────────────────\n"); refresh();
 }
 
 void draw_button(WINDOW *win, int coord_y, int coord_x, const char *palavra){
-    mvwprintw(win, coord_y, coord_x, "\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF");      // Parte superior do botão
-    mvwprintw(win, coord_y+1, coord_x, "\xB3 %-8s \xB3", palavra); // Texto do botão
-    mvwprintw(win, coord_y+2, coord_x, "\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9");      // Parte inferior do botão
+    mvwprintw(win, coord_y, coord_x, "┌───────────┐");      // Parte superior do botão
+    mvwprintw(win, coord_y+1, coord_x, "│ %-8s │", palavra); // Texto do botão
+    mvwprintw(win, coord_y+2, coord_x, "└───────────┘");      // Parte inferior do botão
     wrefresh(win);
 }
 
@@ -89,25 +89,25 @@ void desenharCartasLadoALado(Carta *cartas, int numCartas){
         for (int i = 0; i < numCartas; i++){
             switch (linha){
             case 0:
-                printw("\t\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF ");
+                printw("\t┌───────┐ ",);
                 break;
             case 1:
-                printw("\t\xB3 %-2s    \xB3 ", cartas[i].rank);
+                printw("\t│ %-2s    │ ", cartas[i].rank);
                 break;
             case 2:
-                printw("\t\xB3       \xB3 "); // Linha vazia
+                printw("\t│       │ "); // Linha vazia
                 break;
             case 3:
-                printw("\t\xB3 %-6s\xB3 ", cartas[i].naipe); // Exibe o naipe da carta
+                printw("\t│ %-6s│ ", cartas[i].naipe); // Exibe o naipe da carta
                 break;
             case 4:
-                printw("\t\xB3       \xB3 "); // Linha vazia
+                printw("\t│       │ "); // Linha vazia
                 break;
             case 5:
-                printw("\t\xB3    %-2s \xB3 ", cartas[i].rank); // Exibe o valor da carta (base direita)
+                printw("\t│    %-2s │ ", cartas[i].rank); // Exibe o valor da carta (base direita)
                 break;
             case 6:
-                printw("\t\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9 "); // Linha inferior
+                printw("\t└───────┘ "); // Linha inferior
                 break;
             }
         }
