@@ -337,6 +337,7 @@ void relatorio(int V_Player, int V_Dealer, int Empates){
 int a=1, opcao1=-1;
 int menu(MEVENT *mousevent, int *opcao1) {
     int somaPlayer, resultDealer = 0, *respPlayer;
+    resize_term(50, 80); //Reajuste da resolução da tela
 
     if (a == 1) {
         printw("\t      Bem-vindo ao menu, deseja jogar?\n");
