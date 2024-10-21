@@ -33,15 +33,40 @@ typedef struct{ // Struct que ter� as informa��es de cada carta
 } Carta;
 
 void cabecalho(){
-    printw("\t\t─────────────────────\n");
+    printw("\t\t");
+    for (int i = 0; i < 35; i++){
+        addch(ACS_HLINE);
+    }
+    printw("\n");
     printw("\t\t\tJogo de Black Jack\t\t\t\n\n");
-    printw("\t\t─────────────────────\n"); refresh();
-}
+    printw("\t\t");
+    for (int i = 0; i < 35; i++){
+        addch(ACS_HLINE);
+    }
+    printw("\n");
+    refresh();
+}   
 
 void draw_button(WINDOW *win, int coord_y, int coord_x, const char *palavra){
-    mvwprintw(win, coord_y, coord_x, "┌───────────┐");      // Parte superior do botão
-    mvwprintw(win, coord_y+1, coord_x, "│ %-8s │", palavra); // Texto do botão
-    mvwprintw(win, coord_y+2, coord_x, "└───────────┘");      // Parte inferior do botão
+    // Parte superior do botão
+    mvwaddch(win, coord_y, coord_x, ACS_ULCORNER);
+    for (int i = 1; i < 13; i++){
+        mvwaddch(win, coord_y, coord_x + i, ACS_HLINE); 
+    }
+    mvwaddch(win, coord_y, coord_x + 13, ACS_URCORNER);
+
+    // Texto do botão
+    mvwaddch(win, coord_y + 1, coord_x, ACS_VLINE);
+    mvwprintw(win, coord_y + 1, coord_x + 1, " %-8s ", palavra); 
+    mvwaddch(win, coord_y + 1, coord_x + 13, ACS_VLINE);
+
+    // Parte inferior do botão
+    mvwaddch(win, coord_y + 2, coord_x, ACS_LLCORNER);
+    for (int i = 1; i < 13; i++){
+        mvwaddch(win, coord_y + 2, coord_x + i, ACS_HLINE); 
+    }
+    mvwaddch(win, coord_y + 2, coord_x + 13, ACS_LRCORNER);
+
     wrefresh(win);
 }
 
@@ -63,7 +88,7 @@ int botao_sn(MEVENT *mousevent, int coord_x, int coord_y,const char *button_1, c
         if (value_button == KEY_MOUSE){
             if (getmouse(mousevent) == OK){
                 if (mousevent->bstate & BUTTON1_CLICKED){
-                    printw("Mouse clicked at (%d, %d)\n", mousevent->x, mousevent->y); refresh();
+                    // printw("Mouse clicked at (%d, %d)\n", mousevent->x, mousevent->y); refresh();
                     if (clique_button(mousevent->x, mousevent->y, coord_y, coord_x, 13, 3)){
                         resp_button = 1;
                         printw("Botão 'Sim' clicado.\n");
@@ -84,30 +109,62 @@ int botao_sn(MEVENT *mousevent, int coord_x, int coord_y,const char *button_1, c
     return resp_button;
 }
 
-void desenharCartasLadoALado(Carta *cartas, int numCartas){
+void desenharCartasLadoALado(Carta *deckAlvo, int numCartas){
     for (int linha = 0; linha < 7; linha++){ // Alterado para 7, pois o desenho tem 7 linhas (contando a borda inferior)
         for (int i = 0; i < numCartas; i++){
             switch (linha){
             case 0:
-                printw("\t┌───────┐ ");
+                // printw("\t\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF ");
+                printw("\t");
+                addch(ACS_ULCORNER);
+                for (int i = 0; i < 7; i++){
+                    addch(ACS_HLINE);
+                }
+                addch(ACS_URCORNER);
                 break;
             case 1:
-                printw("\t│ %-2s    │ ", cartas[i].rank);
+                // printw("\t\xB3 %-2s    \xB3 ", deckAlvo[i].rank);
+                printw("\t");
+                addch(ACS_VLINE);
+                printw(" %-2s    ", deckAlvo[i].rank);
+                addch(ACS_VLINE);
                 break;
             case 2:
-                printw("\t│       │ "); // Linha vazia
+                // printw("\t\xB3       \xB3 "); // Linha vazia
+                printw("\t");
+                addch(ACS_VLINE);
+                printw("       ");
+                addch(ACS_VLINE);
                 break;
             case 3:
-                printw("\t│ %-6s│ ", cartas[i].naipe); // Exibe o naipe da carta
+                // printw("\t\xB3 %-6s\xB3 ", deckAlvo[i].naipe); // Exibe o naipe da carta
+                printw("\t");
+                addch(ACS_VLINE);
+                printw(" %-6s", deckAlvo[i].naipe);
+                addch(ACS_VLINE);
                 break;
             case 4:
-                printw("\t│       │ "); // Linha vazia
+                // printw("\t\xB3       \xB3 "); // Linha vazia
+                printw("\t");
+                addch(ACS_VLINE);
+                printw("       ");
+                addch(ACS_VLINE);
                 break;
             case 5:
-                printw("\t│    %-2s │ ", cartas[i].rank); // Exibe o valor da carta (base direita)
+                // printw("\t\xB3    %-2s \xB3 ", deckAlvo[i].rank); // Exibe o valor da carta (base direita)
+                printw("\t");
+                addch(ACS_VLINE);
+                printw("    %-2s ", deckAlvo[i].rank);
+                addch(ACS_VLINE);
                 break;
             case 6:
-                printw("\t└───────┘ "); // Linha inferior
+                // printw("\t\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9 "); // Linha inferior
+                printw("\t");
+                addch(ACS_LLCORNER);
+                for (int i = 0; i < 7; i++){
+                    addch(ACS_HLINE);
+                }
+                addch(ACS_LRCORNER);
                 break;
             }
         }
@@ -139,22 +196,17 @@ void embaralharBaralho(Carta *baralho){ // Fun��o para embaralhar cartas
     }
 }
 
-void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta **baralho, int *tamanhoBaralho){
-    deckAlvo[(*numCartasAgora)] = (*baralho)[0]; // O deck alvo recebe a primeira carta do baralho
+void pegarCarta(Carta *deckAlvo, int *numCartasAgora, Carta *baralho, int *tamanhoBaralho){
+    deckAlvo[(*numCartasAgora)] = baralho[0]; // O deck alvo recebe a primeira carta do baralho
     (*numCartasAgora)++;                         // Troca do �ndice do deck alvo
 
     for (int i = 0; i < *tamanhoBaralho - 1; i++){
-        (*baralho)[i] = (*baralho)[i + 1]; // Substitui o primeiro elemento pelo q vem depois, e assim vai
+        baralho[i] = baralho[i + 1]; // Substitui o primeiro elemento pelo q vem depois, e assim vai
     }
     (*tamanhoBaralho)--;
 
     // Reallocate baralho
-    Carta *newBaralho = realloc(*baralho, (*tamanhoBaralho) * sizeof(Carta));
-    if (newBaralho == NULL && *tamanhoBaralho > 0){
-        fprintf(stderr, "Erro na realloc.\n");
-        exit(1);
-    }
-    *baralho = newBaralho; // Atualiza o ponteiro do baralho
+    baralho = (Carta*) realloc(baralho, (*tamanhoBaralho) * sizeof(Carta));
 }
 int somaCartas(Carta *deckAlvo, int *numCartasAgora){
     int soma = 0, num_A = 0;
@@ -193,8 +245,8 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho, MEVEN
     }
 
     // O player pega carta duas vezes
-    pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
-    pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
+    pegarCarta(*cartasPlayer, totCartasPlayer, baralho, &varTamBaralho);
+    pegarCarta(*cartasPlayer, totCartasPlayer, baralho, &varTamBaralho);
 
     printw("\n\t\t\tCartas do Jogador:\n");
     desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
@@ -212,7 +264,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho, MEVEN
 
         if (opcao2 == 1){
             if (*totCartasPlayer < maxCartasPegas){
-                pegarCarta(*cartasPlayer, totCartasPlayer, &baralho, &varTamBaralho);
+                pegarCarta(*cartasPlayer, totCartasPlayer, baralho, &varTamBaralho);
                 clear();
 
                 cabecalho();
@@ -267,11 +319,11 @@ int Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPl
     }
 
     // O dealer pega carta uma vez
-    pegarCarta(cartasDealer, &totCartasDealer, &baralho, &varTamBaralho);
+    pegarCarta(cartasDealer, &totCartasDealer, baralho, &varTamBaralho);
     totalDealer = somaCartas(cartasDealer, &totCartasDealer);
 
     while (totalDealer < 17 && totalDealer < somaPlayer){
-        pegarCarta(cartasDealer, &totCartasDealer, &baralho, &varTamBaralho);
+        pegarCarta(cartasDealer, &totCartasDealer, baralho, &varTamBaralho);
         totalDealer = somaCartas(cartasDealer, &totCartasDealer);
         printw("\n");
 
@@ -337,7 +389,7 @@ void relatorio(int V_Player, int V_Dealer, int Empates){
 int a=1, opcao1=-1;
 int menu(MEVENT *mousevent, int *opcao1) {
     int somaPlayer, resultDealer = 0, *respPlayer;
-    resize_term(50, 80); //Reajuste da resolução da tela
+    resize_term(50, 100);
 
     if (a == 1) {
         printw("\t      Bem-vindo ao menu, deseja jogar?\n");
@@ -379,10 +431,10 @@ int menu(MEVENT *mousevent, int *opcao1) {
 
         printw("\n\t\t   Deseja jogar novamente?\n "); refresh();
         if(somaPlayer >= 0){
-        *respPlayer=botao_sn(mousevent, 16, 25,"sim","não"); //ordem x, y
+        *respPlayer=botao_sn(mousevent, 17, 28,"sim","não"); //ordem x, y
         printw("\n"); refresh();
         }else{
-        *respPlayer=botao_sn(mousevent, 16, 17,"sim","não"); //ordem x, y
+        *respPlayer=botao_sn(mousevent, 17, 17,"sim","não"); //ordem x, y
         printw("\n"); refresh();
         }
 
@@ -412,8 +464,7 @@ int menu(MEVENT *mousevent, int *opcao1) {
 }
 
 int main(){                      // Fun��o main
-    srand(time(NULL)); // Cria uma semente aleatória
-
+    srand(time(NULL)); // Cria uma semente aleatória;
     iniciar_ncurses();
 
     mousemask(ALL_MOUSE_EVENTS, NULL);// habilita os eventos com o mouse
