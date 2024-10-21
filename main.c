@@ -33,9 +33,9 @@ typedef struct{ // Struct que ter� as informa��es de cada carta
 } Carta;
 
 void cabecalho(){
-    printw("\t\t\x─────────────────────\n");
+    printw("\t\t─────────────────────\n");
     printw("\t\t\tJogo de Black Jack\t\t\t\n\n");
-    printw("\t\t\x─────────────────────\n"); refresh();
+    printw("\t\t─────────────────────\n"); refresh();
 }
 
 void draw_button(WINDOW *win, int coord_y, int coord_x, const char *palavra){
@@ -89,7 +89,7 @@ void desenharCartasLadoALado(Carta *cartas, int numCartas){
         for (int i = 0; i < numCartas; i++){
             switch (linha){
             case 0:
-                printw("\t┌───────┐ ",);
+                printw("\t┌───────┐ ");
                 break;
             case 1:
                 printw("\t│ %-2s    │ ", cartas[i].rank);
