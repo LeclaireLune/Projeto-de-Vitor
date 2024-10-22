@@ -32,6 +32,107 @@ typedef struct{ // Struct que ter� as informa��es de cada carta
     const char *naipe;
 } Carta;
 
+/* TESTES APOSTAS */
+int saldoPlayer = 100; // Jogador começa com saldo no valor de 100 para apostar
+int saldoDeApostas = 0; // A quantidade apostada pelo jogador começa com zero
+
+int botao_apostas(MEVENT *mousevent, int coord_x, int coord_y, const char *button_1, const char *button_2, const char *button_3, const char *button_4){
+    int resp_button = -1, value_button = 0;
+
+    draw_button(stdscr, coord_y, coord_x, button_1);  
+    draw_button(stdscr, coord_y, coord_x+15, button_2); 
+    draw_button(stdscr, coord_y, coord_x+30, button_3);
+    draw_button(stdscr, coord_y+3, coord_x+15, button_4);
+    refresh();
+
+    while (1){
+        value_button = getch();
+
+        if (value_button == KEY_MOUSE){
+            if (getmouse(mousevent) == OK){
+                if (mousevent->bstate & BUTTON1_CLICKED){
+                    // printw("Mouse clicked at (%d, %d)\n", mousevent->x, mousevent->y); refresh();
+                    if (clique_button(mousevent->x, mousevent->y, coord_y, coord_x, 13, 3)){
+                        resp_button = 0;
+                        refresh();
+                        break;
+                    }else if (clique_button(mousevent->x, mousevent->y, coord_y, coord_x+15, 13, 3)) {
+                        resp_button = 1;
+                        refresh();
+                        break;
+                    }
+                    else if (clique_button(mousevent->x, mousevent->y, coord_y, coord_x + 30, 13, 3)){
+                        resp_button = 2;
+                        refresh();
+                        break;
+                    }
+                    else if (clique_button(mousevent->x, mousevent->y, coord_y+3, coord_x + 15, 13, 3)){
+                        resp_button = 3;
+                        refresh();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return resp_button;
+}
+
+int menuApostas(MEVENT *mousevent){
+    if (saldoPlayer == 0){
+        clear();
+        cabecalho();
+        printw("\n\n\t\tVoce faliu! Boa sorte na próxima...\n\n"); refresh();
+        relatorio(V_Player, V_Dealer, Empates);
+        int end = getch();
+        endwin();
+        exit(1);
+    }
+
+    int escolha;
+
+    clear();
+    cabecalho();
+
+    printw("\n\t\tSaldo atual: %d\tValor apostado: %d", saldoPlayer, saldoDeApostas);
+    printw("\n\n\t\tFaça sua aposta:"); refresh();
+
+    escolha = botao_apostas(mousevent, 16, 8, "20", "100", "200", "Jogar!");
+    
+    if(escolha == 0){
+        if (saldoDeApostas + 20 <= saldoPlayer){
+            saldoDeApostas += 20;
+        }
+        else {
+            printw("\n\n\n\nVoce nao pode mais apostar dessa quantia!");refresh();
+        }
+        return 0;
+    }
+    else if (escolha == 1){
+        if (saldoDeApostas + 100 <= saldoPlayer){
+            saldoDeApostas += 100;
+        }
+        else {
+            printw("\n\n\n\nVoce nao pode mais apostar dessa quantia!"); refresh();
+        }
+        return 0;
+    }
+    else if (escolha == 2){
+        if (saldoDeApostas + 200 <= saldoPlayer){
+            saldoDeApostas += 200;
+        }
+        else {
+            printw("\n\n\n\nVoce nao pode mais apostar dessa quantia!"); refresh();
+        }
+        return 0;
+    }
+    else if (escolha == 3){
+        return 1;
+    }
+    
+    clear();
+}
+
 void cabecalho(){
     printw("\t\t");
     for (int i = 0; i < 35; i++){
@@ -277,8 +378,11 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho, MEVEN
                     clear();
                     cabecalho();
                     desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
-                    printw("\n\t\t\t  Você perdeu!\n");
-                    printw("\n\t\t     Você obteve %d pontos.\n", somaCartas(*cartasPlayer, totCartasPlayer)); refresh();
+                    printw("\n\t\t\t  Você perdeu!");
+                    printw("\n\t\t     Você obteve %d pontos.", somaCartas(*cartasPlayer, totCartasPlayer)); 
+                    printw("\n\t\t  Você perdeu %d de sua aposta.\n", saldoDeApostas); refresh();
+                    saldoPlayer -= saldoDeApostas;
+                    saldoDeApostas = 0;
                     return -1;
                 }
                 else{
@@ -341,19 +445,30 @@ int Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPl
     }
 
     if (totalDealer > 21 || totalDealer < somaPlayer){
-        printw("\n\t\tVocê venceu! O Dealer ficou com: %d pontos\n", totalDealer);refresh();
+        printw("\n\t\tVocê venceu! O Dealer ficou com: %d pontos\n", totalDealer);
+        printw("\t\tVoce ganhou %d pela sua aposta!", saldoDeApostas); refresh();
+        saldoPlayer += saldoDeApostas;
+        saldoDeApostas = 0;
         return 1;
     }
     else{
         if (totalDealer > somaPlayer){
-            printw("\n\t    Você perdeu! O Dealer conseguiu: %d pontos\n", totalDealer); refresh();
+            printw("\n\t    Você perdeu! O Dealer conseguiu: %d pontos\n", totalDealer);
+            printw("\t\t  Você perdeu %d de sua aposta.", saldoDeApostas); refresh();
+            saldoPlayer -= saldoDeApostas;
+            saldoDeApostas = 0;
             return -1;
         }else{
             if (totalDealer == somaPlayer){
-                printw("\n\t\tVocê empatou! Ambos ficaram com: %d pontos\n", totalDealer); refresh();
+                printw("\n\t\tVocê empatou! Ambos ficaram com: %d pontos\n", totalDealer);
+                printw("\t  Nada foi ganho, nada foi perdido com sua aposta"); refresh();
+                saldoDeApostas = 0;
                 return 0;
             }else{
-                printw("\n\t\tVocê perdeu! O Dealer ficou com: %d pontos\n", totalDealer); refresh();
+                printw("\n\t\tVocê perdeu! O Dealer ficou com: %d pontos\n", totalDealer);
+                printw("\t\t  Você perdeu %d de sua aposta.", saldoDeApostas); refresh();
+                saldoPlayer -= saldoDeApostas;
+                saldoDeApostas = 0;
                 return -1;
             }
         }
@@ -374,6 +489,7 @@ void relatorio(int V_Player, int V_Dealer, int Empates){
     fprintf(arq_relat, "\t\tO número de vitórias do player foram de: %d\n", V_Player);
     fprintf(arq_relat, "\t   O número de derrotas para o Dealer foram de: %d\n", V_Dealer);
     fprintf(arq_relat, "\t\tO número de empates foram de: %d\n", Empates);
+    fprintf(arq_relat, "\t\tO lucro total com apostas foi de: %d\n", saldoPlayer - 100);
     fprintf(arq_relat, "\n\n");
 
     cabecalho();
@@ -381,6 +497,7 @@ void relatorio(int V_Player, int V_Dealer, int Empates){
     printw("\t\tO número de vitórias do player foram de: %d\n",V_Player); refresh();
     printw("\t   O número de derrotas para o Dealer foram de: %d\n",V_Dealer); refresh();
     printw("\t\tO número de empates foram de: %d\n",Empates); refresh();
+    printw("\t\tO lucro total com apostas foi de: %d\n", saldoPlayer - 100); refresh();
     printw("\n\n"); refresh();
 
     fclose(arq_relat);
@@ -403,6 +520,17 @@ int menu(MEVENT *mousevent, int *opcao1) {
 
     if (*opcao1 == 1) {
         clear(); refresh();
+        while(1){
+            int apostaFeita = menuApostas(mousevent);
+            if (apostaFeita != 1){
+                continue;
+            }
+            else {
+                clear();
+                break;
+            }
+        }
+
         Carta *baralho = malloc(tamBaralho * sizeof(Carta));
         if (baralho == NULL) {
             printw("Erro ao alocar memória para o baralho.\n"); refresh();

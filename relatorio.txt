@@ -2,8 +2,9 @@
 			Relatório do Black Jack			
 
 		----------------------------------
-		O número de vitórias do player foram de: 0
-	   O número de derrotas para o Dealer foram de: 1
-		O número de empates foram de: 0
+		O número de vitórias do player foram de: 1
+	   O número de derrotas para o Dealer foram de: 4
+		O número de empates foram de: 1
+			O lucro total com apostas foi de: -60
 
 
