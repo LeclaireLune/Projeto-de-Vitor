@@ -37,6 +37,21 @@ int saldoDeApostas = 0; // A quantidade apostada pelo jogador começa com zero
 
 int V_Player = 0, V_Dealer = 0, Empates = 0;
 
+void cabecalho(){
+    printw("\t\t");
+    for (int i = 0; i < 35; i++){
+        addch(ACS_HLINE);
+    }
+    printw("\n");
+    printw("\t\t\tJogo de Black Jack\t\t\t\n\n");
+    printw("\t\t");
+    for (int i = 0; i < 35; i++){
+        addch(ACS_HLINE);
+    }
+    printw("\n");
+    refresh();
+}
+
 void relatorio(int V_Player, int V_Dealer, int Empates)
 {
     FILE *arq_relat = fopen("relatorio.txt", "w");
@@ -69,11 +84,39 @@ void relatorio(int V_Player, int V_Dealer, int Empates)
 
 /* TESTES APOSTAS */
 
+void draw_button(WINDOW *win, int coord_y, int coord_x, const char *palavra){
+    // Parte superior do botão
+    mvwaddch(win, coord_y, coord_x, ACS_ULCORNER);
+    for (int i = 1; i < 13; i++){
+        mvwaddch(win, coord_y, coord_x + i, ACS_HLINE);
+    }
+    mvwaddch(win, coord_y, coord_x + 13, ACS_URCORNER);
+
+    // Texto do botão
+    mvwaddch(win, coord_y + 1, coord_x, ACS_VLINE);
+    mvwprintw(win, coord_y + 1, coord_x + 1, " %-8s ", palavra);
+    mvwaddch(win, coord_y + 1, coord_x + 13, ACS_VLINE);
+
+    // Parte inferior do botão
+    mvwaddch(win, coord_y + 2, coord_x, ACS_LLCORNER);
+    for (int i = 1; i < 13; i++){
+        mvwaddch(win, coord_y + 2, coord_x + i, ACS_HLINE);
+    }
+    mvwaddch(win, coord_y + 2, coord_x + 13, ACS_LRCORNER);
+
+    wrefresh(win);
+}
+
+int clique_button(int mouse_x, int mouse_y, int button_y, int button_x, int button_width, int button_height) {
+    return (mouse_x >= button_x && mouse_x <= button_x + button_width &&
+            mouse_y >= button_y && mouse_y <= button_y + button_height);
+}
+
 int botao_apostas(MEVENT *mousevent, int coord_x, int coord_y, const char *button_1, const char *button_2, const char *button_3, const char *button_4){
     int resp_button = -1, value_button = 0;
 
-    draw_button(stdscr, coord_y, coord_x, button_1);  
-    draw_button(stdscr, coord_y, coord_x+15, button_2); 
+    draw_button(stdscr, coord_y, coord_x, button_1);
+    draw_button(stdscr, coord_y, coord_x+15, button_2);
     draw_button(stdscr, coord_y, coord_x+30, button_3);
     draw_button(stdscr, coord_y+3, coord_x+15, button_4);
     refresh();
@@ -131,7 +174,7 @@ int menuApostas(MEVENT *mousevent){
     printw("\n\n\t\tFaça sua aposta:"); refresh();
 
     escolha = botao_apostas(mousevent, 16, 8, "20", "100", "200", "Jogar!");
-    
+
     if(escolha == 0){
         if (saldoDeApostas + 20 <= saldoPlayer){
             saldoDeApostas += 20;
@@ -162,51 +205,8 @@ int menuApostas(MEVENT *mousevent){
     else if (escolha == 3){
         return 1;
     }
-    
+
     clear();
-}
-
-void cabecalho(){
-    printw("\t\t");
-    for (int i = 0; i < 35; i++){
-        addch(ACS_HLINE);
-    }
-    printw("\n");
-    printw("\t\t\tJogo de Black Jack\t\t\t\n\n");
-    printw("\t\t");
-    for (int i = 0; i < 35; i++){
-        addch(ACS_HLINE);
-    }
-    printw("\n");
-    refresh();
-}   
-
-void draw_button(WINDOW *win, int coord_y, int coord_x, const char *palavra){
-    // Parte superior do botão
-    mvwaddch(win, coord_y, coord_x, ACS_ULCORNER);
-    for (int i = 1; i < 13; i++){
-        mvwaddch(win, coord_y, coord_x + i, ACS_HLINE); 
-    }
-    mvwaddch(win, coord_y, coord_x + 13, ACS_URCORNER);
-
-    // Texto do botão
-    mvwaddch(win, coord_y + 1, coord_x, ACS_VLINE);
-    mvwprintw(win, coord_y + 1, coord_x + 1, " %-8s ", palavra); 
-    mvwaddch(win, coord_y + 1, coord_x + 13, ACS_VLINE);
-
-    // Parte inferior do botão
-    mvwaddch(win, coord_y + 2, coord_x, ACS_LLCORNER);
-    for (int i = 1; i < 13; i++){
-        mvwaddch(win, coord_y + 2, coord_x + i, ACS_HLINE); 
-    }
-    mvwaddch(win, coord_y + 2, coord_x + 13, ACS_LRCORNER);
-
-    wrefresh(win);
-}
-
-int clique_button(int mouse_x, int mouse_y, int button_y, int button_x, int button_width, int button_height) {
-    return (mouse_x >= button_x && mouse_x <= button_x + button_width &&
-            mouse_y >= button_y && mouse_y <= button_y + button_height);
 }
 
 int botao_sn(MEVENT *mousevent, int coord_x, int coord_y,const char *button_1, const char *button_2) {
@@ -412,7 +412,7 @@ int jogoPlayer(Carta **cartasPlayer, int *totCartasPlayer, Carta *baralho, MEVEN
                     cabecalho();
                     desenharCartasLadoALado(*cartasPlayer, *totCartasPlayer);
                     printw("\n\t\t\t  Você perdeu!");
-                    printw("\n\t\t     Você obteve %d pontos.", somaCartas(*cartasPlayer, totCartasPlayer)); 
+                    printw("\n\t\t     Você obteve %d pontos.", somaCartas(*cartasPlayer, totCartasPlayer));
                     printw("\n\t\t  Você perdeu %d de sua aposta.\n", saldoDeApostas); refresh();
                     saldoPlayer -= saldoDeApostas;
                     saldoDeApostas = 0;
