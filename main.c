@@ -32,9 +32,42 @@ typedef struct{ // Struct que ter� as informa��es de cada carta
     const char *naipe;
 } Carta;
 
-/* TESTES APOSTAS */
-int saldoPlayer = 100; // Jogador começa com saldo no valor de 100 para apostar
+int saldoPlayer = 100;  // Jogador começa com saldo no valor de 100 para apostar
 int saldoDeApostas = 0; // A quantidade apostada pelo jogador começa com zero
+
+int V_Player = 0, V_Dealer = 0, Empates = 0;
+
+void relatorio(int V_Player, int V_Dealer, int Empates)
+{
+    FILE *arq_relat = fopen("relatorio.txt", "w");
+
+    fprintf(arq_relat, "\t\t----------------------------------\n");
+    fprintf(arq_relat, "\t\t\tRelatório do Black Jack\t\t\t\n\n");
+    fprintf(arq_relat, "\t\t----------------------------------\n");
+
+    fprintf(arq_relat, "\t\tO número de vitórias do player foram de: %d\n", V_Player);
+    fprintf(arq_relat, "\t   O número de derrotas para o Dealer foram de: %d\n", V_Dealer);
+    fprintf(arq_relat, "\t\tO número de empates foram de: %d\n", Empates);
+    fprintf(arq_relat, "\tO lucro total com apostas foi de: %d\n", saldoPlayer - 100);
+    fprintf(arq_relat, "\n\n");
+
+    cabecalho();
+
+    printw("\t\tO número de vitórias do player foram de: %d\n", V_Player);
+    refresh();
+    printw("\t   O número de derrotas para o Dealer foram de: %d\n", V_Dealer);
+    refresh();
+    printw("\t\tO número de empates foram de: %d\n", Empates);
+    refresh();
+    printw("\t\tO lucro total com apostas foi de: %d\n", saldoPlayer - 100);
+    refresh();
+    printw("\n\n");
+    refresh();
+
+    fclose(arq_relat);
+}
+
+/* TESTES APOSTAS */
 
 int botao_apostas(MEVENT *mousevent, int coord_x, int coord_y, const char *button_1, const char *button_2, const char *button_3, const char *button_4){
     int resp_button = -1, value_button = 0;
@@ -477,31 +510,6 @@ int Dealer(Carta *baralho, int somaPlayer, Carta *cartasPlayer, int *totCartasPl
     free(cartasDealer);
 }
 
-int V_Player = 0, V_Dealer = 0, Empates = 0;
-
-void relatorio(int V_Player, int V_Dealer, int Empates){
-    FILE *arq_relat = fopen("relatorio.txt", "w");
-
-    fprintf(arq_relat, "\t\t----------------------------------\n");
-    fprintf(arq_relat, "\t\t\tRelatório do Black Jack\t\t\t\n\n");
-    fprintf(arq_relat, "\t\t----------------------------------\n");
-
-    fprintf(arq_relat, "\t\tO número de vitórias do player foram de: %d\n", V_Player);
-    fprintf(arq_relat, "\t   O número de derrotas para o Dealer foram de: %d\n", V_Dealer);
-    fprintf(arq_relat, "\t\tO número de empates foram de: %d\n", Empates);
-    fprintf(arq_relat, "\t\tO lucro total com apostas foi de: %d\n", saldoPlayer - 100);
-    fprintf(arq_relat, "\n\n");
-
-    cabecalho();
-
-    printw("\t\tO número de vitórias do player foram de: %d\n",V_Player); refresh();
-    printw("\t   O número de derrotas para o Dealer foram de: %d\n",V_Dealer); refresh();
-    printw("\t\tO número de empates foram de: %d\n",Empates); refresh();
-    printw("\t\tO lucro total com apostas foi de: %d\n", saldoPlayer - 100); refresh();
-    printw("\n\n"); refresh();
-
-    fclose(arq_relat);
-}
 
 int a=1, opcao1=-1;
 int menu(MEVENT *mousevent, int *opcao1) {
